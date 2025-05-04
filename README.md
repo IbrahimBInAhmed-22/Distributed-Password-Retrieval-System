@@ -82,7 +82,7 @@ The goal is to help improve security awareness and strengthen Wi-Fi networks thr
 
 1. **Install Dependencies**: Ensure that Python 3.x is installed, and required libraries (`Scapy`, `socket`, etc.) are available.
    
-2. **Set Up Server**: The server captures the WPA2 handshake and splits the password list. Once the handshake and list are prepared, the server will start distributing password chunks to connected clients.
+2. **Set Up Server**: The server captures the WPA2 handshake and splits the password list. Once the handshake and list are prepared, the server will start distributing password chunks to connected clients. Import the hammm01-07.cap in the same location.
 
 3. **Run Clients**: Start the clients on different machines or on the same machine using different processes. Each client will receive a password chunk and start testing passwords locally.
 
