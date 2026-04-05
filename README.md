@@ -1,6 +1,6 @@
 # Distributed WPA2 Password Cracker
 
-> A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
+A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
 
 
 
