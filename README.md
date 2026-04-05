@@ -1,6 +1,6 @@
 # Distributed WPA2 Password Cracker
 
-> A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
+A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
 
   
 
@@ -45,7 +45,7 @@ Traditional WPA2 dictionary attacks run on a **single machine** — slow, hardwa
 
 - The **server** reads a `.cap` packet capture, extracts all the cryptographic material from the WPA2 4-way handshake (AP/client MACs, ANonce, SNonce, MIC, EAPOL frame), divides a wordlist into equal-sized chunks, and assigns one chunk to each connected client.
 - Each **client** receives its chunk and the handshake data, then runs the full WPA2 key derivation (PBKDF2 → PRF-512 → HMAC-SHA1) independently on every password in its range.
-- The moment any client finds the correct password it reports `FOUND:<password>` to the server, which immediately broadcasts a `STOP` command to all other clients — stopping wasted work.
+- The moment any client finds the correct password it reports `FOUND:<password ` to the server, which immediately broadcasts a `STOP` command to all other clients — stopping wasted work.
 
 The entire system is implemented in **C++ with Winsock2** (Windows) and **OpenSSL** for cryptographic operations.
 
@@ -70,7 +70,7 @@ project/
 └── README.md            # This file
 ```
 
-> **Note:** `T3.txt` (the wordlist) is referenced in `main()` but not included in the repository — you must supply your own wordlist file.
+  **Note:** `T3.txt` (the wordlist) is referenced in `main()` but not included in the repository — you must supply your own wordlist file.
 
   
 
@@ -370,12 +370,12 @@ if (select(0, &readfds, nullptr, nullptr, &tv) > 0) {
 
 Both are standard **pcap format** files (libpcap native format, not pcapng). They contain raw 802.11 frames captured in monitor mode.
 
-> **How to capture your own:**
-> ```bash
-> sudo airodump-ng -c <channel> --bssid <AP_MAC> -w handshake wlan0mon
-> # Optionally force a handshake:
-> sudo aireplay-ng --deauth 5 -a <AP_MAC> wlan0mon
-> ```
+  **How to capture your own:**
+  ```bash
+  sudo airodump-ng -c <channel> --bssid <AP_MAC> -w handshake wlan0mon
+  # Optionally force a handshake:
+ sudo aireplay-ng --deauth 5 -a <AP_MAC> wlan0mon
+ ```
 
   
 
@@ -524,7 +524,7 @@ Each client prints progress every 25 passwords:
 [*] All threads joined. Password was found: mywifi2023
 ```
 
-> **Running clients on different machines:** In `client.cpp`, change `"127.0.0.1"` in the `inet_pton` call to the server machine's IP address and rebuild.
+ **Running clients on different machines:** In `client.cpp`, change `"127.0.0.1"` in the `inet_pton` call to the server machine's IP address and rebuild.
 
   
 
