@@ -2,13 +2,12 @@
 
 > A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
 
----
+
 
 ## Ethical Use Notice
 
 This tool is designed **exclusively for authorized penetration testing and educational research**. You must have **explicit written permission** from the network owner before using this tool on any Wi-Fi network. Unauthorized use is illegal under computer fraud laws in virtually every jurisdiction. The authors accept no liability for misuse.
 
----
 
 ## Table of Contents
 
@@ -37,7 +36,6 @@ This tool is designed **exclusively for authorized penetration testing and educa
 12. [Known Limitations & Improvements](#12-known-limitations--improvements)
 13. [Key Concepts Tested](#13-key-concepts-tested)
 
----
 
 ## 1. Project Overview
 
@@ -49,11 +47,10 @@ Traditional WPA2 dictionary attacks run on a **single machine** — slow, hardwa
 
 The entire system is implemented in **C++ with Winsock2** (Windows) and **OpenSSL** for cryptographic operations.
 
----
 
 ## 2. File Structure
 
-```
+
 project/
 │
 ├── server.cpp           # Server: pcap parsing, handshake extraction,
@@ -120,9 +117,7 @@ project/
 │          send("FOUND:<password>")                               │
 │          return                                                  │
 └─────────────────────────────────────────────────────────────────┘
-```
 
----
 
 ## 4. WPA2 Cracking — How It Works
 
