@@ -1,16 +1,16 @@
-# 🔐 Distributed WPA2 Password Cracker
+# Distributed WPA2 Password Cracker
 
 > A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
 
 ---
 
-## ⚠️ Ethical Use Notice
+## Ethical Use Notice
 
 This tool is designed **exclusively for authorized penetration testing and educational research**. You must have **explicit written permission** from the network owner before using this tool on any Wi-Fi network. Unauthorized use is illegal under computer fraud laws in virtually every jurisdiction. The authors accept no liability for misuse.
 
 ---
 
-## 📁 Table of Contents
+## Table of Contents
 
 1. [Project Overview](#1-project-overview)
 2. [File Structure](#2-file-structure)
