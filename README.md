@@ -1,13 +1,14 @@
 # Distributed WPA2 Password Cracker
 
-A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
+> A distributed, client-server C++ system that extracts the WPA2 4-way handshake from a `.cap` file, splits a wordlist across multiple cracking clients, and reports the password as soon as any client finds a match — all using raw sockets, OpenSSL cryptography, and multithreading.
 
-
+  
 
 ## Ethical Use Notice
 
 This tool is designed **exclusively for authorized penetration testing and educational research**. You must have **explicit written permission** from the network owner before using this tool on any Wi-Fi network. Unauthorized use is illegal under computer fraud laws in virtually every jurisdiction. The authors accept no liability for misuse.
 
+  
 
 ## Table of Contents
 
@@ -36,6 +37,7 @@ This tool is designed **exclusively for authorized penetration testing and educa
 12. [Known Limitations & Improvements](#12-known-limitations--improvements)
 13. [Key Concepts Tested](#13-key-concepts-tested)
 
+  
 
 ## 1. Project Overview
 
@@ -47,10 +49,11 @@ Traditional WPA2 dictionary attacks run on a **single machine** — slow, hardwa
 
 The entire system is implemented in **C++ with Winsock2** (Windows) and **OpenSSL** for cryptographic operations.
 
+ 
 
 ## 2. File Structure
 
-
+```
 project/
 │
 ├── server.cpp           # Server: pcap parsing, handshake extraction,
@@ -69,7 +72,7 @@ project/
 
 > **Note:** `T3.txt` (the wordlist) is referenced in `main()` but not included in the repository — you must supply your own wordlist file.
 
----
+  
 
 ## 3. Architecture Diagram
 
@@ -80,27 +83,27 @@ project/
 │  ┌────────────────┐    ┌───────────────────────────────────────┐ │
 │  │  .cap file     │───▶│  extractHandshakeParameters()         │ │
 │  │ hammm1-07.cap  │    │  - parseCapturedPacket() per frame    │ │
-│  └────────────────┘    │  - locate Beacon/ProbeResp → BSSID   │ │
-│                        │  - locate M1 (AP→Client EAPOL)       │ │
-│  ┌────────────────┐    │  - locate M2 (Client→AP EAPOL+MIC)   │ │
+│  └────────────────┘    │  - locate Beacon/ProbeResp → BSSID    │ │
+│                        │  - locate M1 (AP→Client EAPOL)        │ │
+│  ┌────────────────┐    │  - locate M2 (Client→AP EAPOL+MIC)    │ │
 │  │  T3.txt        │    │  → HandshakeParameters struct         │ │
 │  │  (wordlist)    │    └───────────────────────────────────────┘ │
 │  └──────┬─────────┘                    │                         │
 │         │ split into N chunks          │ hp (all fields)         │
 │         ▼                              ▼                         │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              accept() loop (1 thread per client)         │   │
-│  │                                                          │   │
-│  │   handleClient(socket, hp, chunk)                        │   │
-│  │   ├── sendHandshakeAndChunk() ─────────────────────────► │   │
-│  │   └── recv() loop ◄── "FOUND:<pw>" or disconnect         │   │
-│  └──────────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │              accept() loop (1 thread per client)         │     │
+│  │                                                          │    │
+│  │   handleClient(socket, hp, chunk)                        │    │
+│  │   ├── sendHandshakeAndChunk() ─────────────────────────► │    │
+│  │   └── recv() loop ◄── "FOUND:<pw>" or disconnect         │    │
+│  └──────────────────────────────────────────────────────────┘    │
 │         │                                                        │
-│         │ on FOUND:  broadcastStop() → "STOP" → all sockets     │
+│         │ on FOUND:  broadcastStop() → "STOP" → all sockets      │
 └─────────┼────────────────────────────────────────────────────────┘
           │  TCP :9999
           │
-┌─────────┼──────────────────────────────────────────────────────┐
+┌─────────┼───────────────────────────────────────────────────────┐
 │         ▼            client.cpp (N instances)                   │
 │  receiveHandshakeAndPasswords()                                 │
 │  ├── ap_mac, client_mac, anonce, snonce                         │
@@ -110,14 +113,16 @@ project/
 │  crackPasswords()                                               │
 │  for each password in chunk:                                    │
 │    ├── [non-blocking select()] check for "STOP"                 │
-│    ├── generatePMK(password, ssid)  ← PBKDF2-SHA1 / 4096 iter  │
-│    ├── customPRF512(pmk, A, B)      ← PRF-512 → 64-byte PTK    │
-│    ├── HMAC-SHA1(ptk[0..15], eapol) → 16-byte computed MIC     │
+│    ├── generatePMK(password, ssid)  ← PBKDF2-SHA1 / 4096 iter   │
+│    ├── customPRF512(pmk, A, B)      ← PRF-512 → 64-byte PTK     │
+│    ├── HMAC-SHA1(ptk[0..15], eapol) → 16-byte computed MIC      │
 │    └── if computed_MIC == captured_MIC                          │
 │          send("FOUND:<password>")                               │
-│          return                                                  │
+│          return                                                 │
 └─────────────────────────────────────────────────────────────────┘
+```
 
+  
 
 ## 4. WPA2 Cracking — How It Works
 
@@ -154,7 +159,7 @@ For each candidate password `P`:
 
 The ordering of MACs and nonces (min-before-max) is mandated by **IEEE 802.11** to ensure both sides derive identical keys regardless of which side computes first.
 
----
+  
 
 ## 5. Server — Deep Dive (`server.cpp`)
 
@@ -234,7 +239,7 @@ When any thread receives `FOUND:<pw>`:
 
 All other threads check `password_found` at the top of their `recv` loop and exit cleanly.
 
----
+  
 
 ## 6. Client — Deep Dive (`client.cpp`)
 
@@ -319,7 +324,7 @@ if (select(0, &readfds, nullptr, nullptr, &tv) > 0) {
 
 `select` with a zero timeout acts as a **poll** — it does not block. If the server has sent `STOP`, the client reads it and exits immediately without waiting for its `recv` loop turn. This ensures fast cooperative shutdown.
 
----
+  
 
 ## 7. Data Flow — End to End
 
@@ -354,7 +359,7 @@ if (select(0, &readfds, nullptr, nullptr, &tv) > 0) {
 7. Output: correct WiFi password printed to console
 ```
 
----
+  
 
 ## 8. Capture Files
 
@@ -372,7 +377,7 @@ Both are standard **pcap format** files (libpcap native format, not pcapng). The
 > sudo aireplay-ng --deauth 5 -a <AP_MAC> wlan0mon
 > ```
 
----
+  
 
 ## 9. Key Data Structures
 
@@ -407,7 +412,7 @@ struct Packet {
 
 Every field sent over TCP is preceded by a 4-byte little-endian `uint32_t` giving the payload size. This lets the receiver allocate the exact buffer size and loop on `recv` until all bytes arrive — critical for correctness over TCP streams.
 
----
+  
 
 ## 10. Build Instructions
 
@@ -460,7 +465,7 @@ g++ -std=c++17 -o client.exe client.cpp \
     -lws2_32 -lssl -lcrypto
 ```
 
----
+  
 
 ## 11. How to Run
 
@@ -521,7 +526,7 @@ Each client prints progress every 25 passwords:
 
 > **Running clients on different machines:** In `client.cpp`, change `"127.0.0.1"` in the `inet_pton` call to the server machine's IP address and rebuild.
 
----
+  
 
 ## 12. Known Limitations & Improvements
 
@@ -544,7 +549,7 @@ Each client prints progress every 25 passwords:
 - **Cross-platform support** — replace Winsock2 with Berkeley sockets + `#ifdef` guards
 - **GPU acceleration** — replace the PBKDF2 loop with an OpenCL/CUDA kernel for orders-of-magnitude speedup on large wordlists
 
----
+  
 
 ## 13. Key Concepts Tested
 
@@ -563,6 +568,6 @@ Each client prints progress every 25 passwords:
 | **Cooperative shutdown** | `broadcastStop()` + client-side STOP polling for clean distributed termination |
 | **Distributed workload splitting** | `chunk_size = passwords.size() / expected_clients` with remainder assigned to last client |
 
----
+  
 
 *README written for academic and security-research review. All testing was performed on networks owned by the authors.*
